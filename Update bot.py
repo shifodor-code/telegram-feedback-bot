@@ -25,17 +25,15 @@ menu_kb.add("📢 Taklif", "⚠️ E’tiroz")
 identity_kb = ReplyKeyboardMarkup(resize_keyboard=True)
 identity_kb.add("📞 Raqam bilan", "👤 Anonim")
 
-# ---------- START ----------
-@dp.message_handler(commands="start", state="*")
-async def start(message: types.Message, state: FSMContext):
-    await state.finish()
+# ---------- HANDLERS ----------
+@dp.message_handler(commands="start")
+async def start(message: types.Message):
     await message.answer(
         "Assalomu alaykum!\nTaklif yoki e’tirozingizni tanlang:",
         reply_markup=menu_kb
     )
     await Form.category.set()
 
-# ---------- CATEGORY ----------
 @dp.message_handler(state=Form.category)
 async def choose_category(message: types.Message, state: FSMContext):
     if message.text not in ["📢 Taklif", "⚠️ E’tiroz"]:
@@ -49,7 +47,6 @@ async def choose_category(message: types.Message, state: FSMContext):
     )
     await Form.identity.set()
 
-# ---------- IDENTITY ----------
 @dp.message_handler(state=Form.identity)
 async def choose_identity(message: types.Message, state: FSMContext):
     if message.text not in ["📞 Raqam bilan", "👤 Anonim"]:
@@ -60,7 +57,6 @@ async def choose_identity(message: types.Message, state: FSMContext):
     await message.answer("Marhamat, murojaatingizni yozing:")
     await Form.message.set()
 
-# ---------- MESSAGE ----------
 @dp.message_handler(state=Form.message)
 async def receive_message(message: types.Message, state: FSMContext):
     data = await state.get_data()
@@ -69,27 +65,23 @@ async def receive_message(message: types.Message, state: FSMContext):
     identity = data["identity"]
 
     user = message.from_user
-    contact = user.phone_number if identity == "📞 Raqam bilan" else "Anonim"
+    phone = user.phone_number if identity == "📞 Raqam bilan" else "Anonim"
 
-    admin_text = (
+    text = (
         f"🆕 Yangi murojaat\n"
         f"📂 Turi: {category}\n"
-        f"👤 User: @{user.username}\n"
-        f"📞 Aloqa: {contact}\n\n"
+        f"👤 Foydalanuvchi: @{user.username}\n"
+        f"📞 Aloqa: {phone}\n\n"
         f"📝 Xabar:\n{message.text}"
     )
 
-    await bot.send_message(ADMIN_ID, admin_text)
-
+    await bot.send_message(ADMIN_ID, text)
     await message.answer(
-        "Rahmat! Murojaatingiz qabul qilindi ✅\n\n"
-        "Yana murojaat qoldirmoqchimisiz?",
+        "Rahmat! Murojaatingiz qabul qilindi ✅",
         reply_markup=menu_kb
     )
 
-    # 🔥 MUHIM QISM
     await state.finish()
-    await Form.category.set()
 
 # ---------- RUN ----------
 if __name__ == "__main__":
