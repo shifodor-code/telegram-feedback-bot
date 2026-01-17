@@ -79,12 +79,13 @@ async def receive_text(message: types.Message, state: FSMContext):
     contact = data["contact"]
 
     text = (
-        f"🆕 Yangi murojaat\n\n"
-        f"📌 Turi: {category}\n"
-        f"👤 Foydalanuvchi: @{message.from_user.username or 'username yo‘q'}\n"
-        f"📞 Aloqa: {contact}\n\n"
-        f"📝 Matn:\n{message.text}"
-    )
+    f"🆕 Yangi murojaat\n\n"
+    f"📌 Turi: {category}\n"
+    f"🆔 User ID: {message.from_user.id}\n"
+    f"👤 Username: @{message.from_user.username or 'username yo‘q'}\n"
+    f"📞 Aloqa: {contact}\n\n"
+    f"📝 Matn:\n{message.text}"
+)
 
     sent = await bot.send_message(ADMIN_ID, text)
     # foydalanuvchi ID ni admin xabariga bog‘lab qo‘yamiz
